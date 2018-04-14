@@ -11,6 +11,8 @@ import java.net.Socket;
  */
 public class Main {
 	private static final int port=8000; 
+	private static Thread ConnectThread;
+	private static Handler handler;
 	public static void main(String[] args) {
 		try {
 			/**
@@ -22,7 +24,9 @@ public class Main {
 				System.out.println("Wait For Connect...");
 				Socket clent=serverSocket.accept();
 				System.out.println("Connect Success..");
-				new Handler(clent);				
+				handler=new Handler(clent);	
+				ConnectThread=new Thread(handler);
+				ConnectThread.start();	
 			}
 		}catch (Exception e) {
 			System.out.println("Server Start Error!");

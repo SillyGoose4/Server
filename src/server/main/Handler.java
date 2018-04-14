@@ -26,10 +26,11 @@ public class Handler implements Runnable  {
 	private DataOutputStream out;
 	private BufferedOutputStream bout;
 	private BufferedInputStream bin;
+	private BufferedReader bReader=null;
+	
 	public Handler(Socket socket) {
 		System.out.println("This is in New Handler");
 		this.socket=socket;
-		this.run();
 	}
 	
 	public void run() {
@@ -39,19 +40,22 @@ public class Handler implements Runnable  {
 		String data;
 		int len=0;
 		try {
+			/* init var*/
 			in=new DataInputStream(socket.getInputStream());
-			out=new DataOutputStream(socket.getOutputStream());
-			bout=new BufferedOutputStream(out);
 			bin=new BufferedInputStream(in);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();  
+			//bReader=new BufferedReader(new InputStreamReader(bin, "UTF-8"));
 			/* Read Data From Client */
 			while((len=bin.read(buffer))!=-1) {
-				
+				baos.write(buffer,0,len);
 			}
 			data=buffer.toString();
 			System.out.println("Recv Success...");
 			System.out.println(data);
 			
 			/* Write Message and Send to Client*/
+			out=new DataOutputStream(socket.getOutputStream());
+			bout=new BufferedOutputStream(out);
 			signIn=new SignIn(data);
 			data=signIn.getMessage().toString();
 			buffer=data.getBytes();
