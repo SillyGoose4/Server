@@ -1,6 +1,9 @@
 package server.main;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -21,6 +24,8 @@ public class Handler implements Runnable  {
 	private SignIn signIn;
 	private DataInputStream in;
 	private DataOutputStream out;
+	private BufferedOutputStream bout;
+	private BufferedInputStream bin;
 	public Handler(Socket socket) {
 		System.out.println("This is in New Handler");
 		this.socket=socket;
@@ -34,34 +39,26 @@ public class Handler implements Runnable  {
 		String data;
 		int len=0;
 		try {
-			System.out.println("Wait For Recv Message!...");
 			in=new DataInputStream(socket.getInputStream());
 			out=new DataOutputStream(socket.getOutputStream());
-			
-			/*												*/
-			/* thare are some mistake in hare				*/
-			/* Sometimes it can't receive Bytes from clent	*/
-			/*												*/
-			/*
-			ByteArrayOutputStream os=new ByteArrayOutputStream();
-			
-			System.out.println("Recv Success..");
-			while((len=inputStream.read(buffer))!=-1) {
-				os.write(buffer);
+			bout=new BufferedOutputStream(out);
+			bin=new BufferedInputStream(in);
+			/* Read Data From Client */
+			while((len=bin.read(buffer))!=-1) {
+				
 			}
-			*/
+			data=buffer.toString();
+			System.out.println("Recv Success...");
+			System.out.println(data);
 			
-			data=in.readUTF();
+			/* Write Message and Send to Client*/
 			signIn=new SignIn(data);
-			messageBox=signIn.getMessage();
-			out.writeUTF(messageBox.toString());
-			//outputStream.write(messageBox.toString().getBytes());
-			/* Test term, please delete after completion. */
-			System.out.println();
-			
-			
+			data=signIn.getMessage().toString();
+			buffer=data.getBytes();
+			out.write(buffer);
+			System.out.println("Write Success");
 		} catch (IOException e) {
-			System.out.println("Get Message Failed");
+			System.out.println("Recv Message Failed");
 			e.printStackTrace();
 		}
 	}
